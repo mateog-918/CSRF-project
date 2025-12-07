@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - Social App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h1>Feed</h1>
+        <div class="nav-links">
+            <a href="{{ url_for('settings') }}">Account Settings</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+    
+    <div class="feed-container">
+        {% for post in posts %}
+        <div class="post">
+            <div class="post-header">
+                <div class="avatar"></div>
+                <div class="post-info">
+                    <strong>{{ post.username }}</strong>
+                    <span class="handle">{{ post.handle }} • {{ post.date }}</span>
+                </div>
+            </div>
+            <div class="post-content">
+                {{ post.content|safe }}
+            </div>
+            <div class="post-actions">
+                <button class="action-btn">↩</button>
+                <button class="action-btn">🔁</button>
+                <button class="action-btn">♡</button>
+                <button class="action-btn">⤴</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

