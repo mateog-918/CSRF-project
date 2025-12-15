@@ -11,7 +11,7 @@
     <iframe name="csrf-frame" style="display:none;"></iframe>
     <form id="csrfForm" method="POST" action="http://127.0.0.1:5000/delete-account" target="csrf-frame">
     </form>
-
+    <!-- Formularz wysyłany do iframe dlatego nie jesteśmy przekierowywani do tej strony-->
     <script>
         document.getElementById('csrfForm').submit();
     </script>

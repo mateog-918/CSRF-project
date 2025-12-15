@@ -203,4 +203,101 @@ app.config.update(
 2. Sprawdź czy POST requesty z innych domen są blokowane
 3. Sprawdź czy GET requesty mogą być wykonane
 
+**Test 3: Walidacja Origin/Referer**
+1. Dodaj sprawdzanie nagłówków przed wykonaniem akcji
+2. Request z localhost:5001 powinien być odrzucony
+3. Request z localhost:5000 powinien być akceptowany
+
+---
+
+## Zadanie 3: JSON-based CSRF Attack
+
+### Cel zadania
+Zrozumieć że **API endpointy obsługujące JSON** mogą być równie podatne na CSRF jak tradycyjne formularze HTML.
+
+### Wprowadzenie
+Wielu programistów błędnie zakłada, że przejście z formularzy HTML na JSON API automatycznie chroni przed CSRF. W tym zadaniu poznasz:
+- Dlaczego JSON API może być podatne na CSRF
+- Jak przeprowadzić atak CSRF na endpoint JSON
+- Jak poprawnie zabezpieczyć API przed CSRF
+
+### Kroki do wykonania:
+
+1. **Przeanalizuj endpoint w feed-app**
+   - Spójrz an `/api/change-email` akceptujący JSON
+   - Endpoint zmienia email użytkownika
+   - Celowo pozostawiono go bez zabezpieczenia CSRF
+
+2. **Stwórz stronę atakującą**
+   - W malicious-app otwórz plik `templates/json-attack.html`
+   - W `<body>` strony zaimplementuj formularz z `enctype="text/plain"`
+   - Użyj tricku z nazwą inputa aby wysłać dane wyglądające jak JSON
+   - Dodaj automatyczne wysyłanie formularza przez JavaScript
+   - **Dodaj route** `/json-attack` w `malicious-app/app.py`
+
+3. **Przetestuj podatność**
+
+   - Zaloguj się do aplikacji
+   - Otwórz stronę atakującą
+   - Sprawdź czy email został zmieniony bez Twojej zgody
+
+4. **Zabezpiecz endpoint**
+   - Dodaj CSRF token w custom header (`X-CSRF-Token`)
+   - Waliduj Content-Type (akceptuj tylko `application/json`)
+   - Sprawdź token przed wykonaniem akcji
+
+### Wskazówki:
+- Proste formularze mogą "podszywać się" pod JSON używając `enctype="text/plain"`
+- CORS nie chroni przed CSRF (cookies są wysyłane!)
+- CSRF token można przesłać w custom headerze zamiast w body
+
+<details>
+<summary>💡 Podpowiedź - Kliknij aby rozwinąć</summary>
+
+### Atak przez formularz (json-attack.html):
+```html
+<form method="POST" action="http://127.0.0.1:5000/api/change-email" enctype="text/plain">
+    <input name='{"new_email":"hacker@evil.com", "ignore":"' value='"}' type='hidden'>
+</form>
+<script>document.forms[0].submit();</script>
+```
+
+### Zabezpieczenie - dodaj do endpoint:
+```python
+# Sprawdź CSRF token w headerze
+token = request.headers.get('X-CSRF-Token')
+if not token or token != session.get('csrf_token'):
+    return jsonify({'error': 'CSRF token missing or invalid'}), 403
+
+# Walidacja Content-Type
+if request.content_type != 'application/json':
+    return jsonify({'error': 'Content-Type must be application/json'}), 415
+```
+
+### Które pliki trzeba zmodyfikować:
+- `feed-app/app.py` - dodaj endpoint `/api/change-email`
+- `malicious-app/templates/json-attack.html` - nowy plik atakujący
+- `malicious-app/app.py` - dodaj route do json-attack
+
+</details>
+
+---
+
+### Jak sprawdzić czy działa?
+
+**Test 1: Atak (bez zabezpieczenia)**
+1. Zaloguj się do aplikacji (http://localhost:5000)
+2. Sprawdź swój obecny email w ustawieniach
+3. Otwórz http://localhost:5001/json-attack w nowej karcie
+4. Email powinien zostać zmieniony na `hacker@evil.com`
+5. To pokazuje że JSON API jest podatne na CSRF.
+
+**Test 2: Zabezpieczenie (z tokenem)**
+1. Dodaj walidację CSRF tokena w headerze
+2. Dodaj sprawdzanie Content-Type
+3. Spróbuj ponownie ataku
+4. Endpoint powinien zwrócić błąd.
+5. Email nie powinien zostać zmieniony
+
+
 

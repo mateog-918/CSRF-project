@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, jsonify, render_template, request, redirect, url_for, session, flash
 from functools import wraps
 
 app = Flask(__name__)
@@ -10,6 +10,7 @@ users = {
     'batman@obawim.com': {
         'username': 'Batman',
         'password': 'password123',
+        'email': 'batman@obawim.com',
         'phone': '123456789',
         'active': True
     }
@@ -65,13 +66,26 @@ def feed():
 @login_required
 def settings():
     email = session['user_email']
+    # Sprawdź czy użytkownik istnieje (może być usunięty po restarcie serwera)
+    if email not in users:
+        session.clear()
+        flash('Session expired or account deleted. Please login again.')
+        return redirect(url_for('login'))
+    
     user = users[email]
-    return render_template('settings.html', user=user, email=email)
+    # Wyświetl zmieniony email jeśli został zmieniony przez CSRF
+    display_email = user.get('email', email)
+    return render_template('settings.html', user=user, email=display_email)
 
 @app.route('/update-settings', methods=['POST'])
 @login_required
 def update_settings():
     email = session['user_email']
+    if email not in users:
+        session.clear()
+        flash('Session expired or account deleted. Please login again.')
+        return redirect(url_for('login'))
+    
     users[email]['phone'] = request.form.get('phone', users[email]['phone'])
     flash('Settings updated successfully')
     return redirect(url_for('settings'))
@@ -83,10 +97,32 @@ def update_settings():
 @login_required
 def delete_account():
     email = session['user_email']
-    users[email]['active'] = False
+    if email in users:
+        users[email]['active'] = False
     session.clear()
     flash('Account deleted successfully')
     return redirect(url_for('login'))
+
+
+@app.route('/api/change-email', methods=['POST'])
+@login_required
+def api_change_email():
+    # PODATNY ENDPOINT - brak walidacji CSRF!
+    # Akceptuje dane z różnych Content-Type (podatność!)
+    data = request.get_json(force=True, silent=True) or {}
+    new_email = data.get('new_email')
+    
+    if new_email:
+        old_email = session['user_email']
+        users[new_email] = users[old_email].copy()
+        users[new_email]['email'] = new_email
+        del users[old_email]
+        session['user_email'] = new_email
+        
+        return jsonify({'status': 'success', 'message': 'Email changed'})
+    
+    return jsonify({'status': 'error', 'message': 'No email provided'}), 400
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
