@@ -159,10 +159,9 @@ csrf = CSRFProtect(app)
 
 ### Jak sprawdzić czy działa?
 1. Zaloguj się do aplikacji (http://127.0.0.1:5000)
-2. Zmień numer telefonu w ustawieniach - ✅ powinno zadziałać
-3. Otwórz złośliwą stronę (http://127.0.0.1:5001/malicious)
-4. Konto NIE powinno zostać usunięte!
-5. Otwierając narzędzia developerskie odnajdując wstawiony fragment  ```html <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> ```  zobaczymy w value nasz token.
+2. Otwórz złośliwą stronę (http://127.0.0.1:5001/malicious)
+3. Konto NIE powinno zostać usunięte!
+4. Otwierając narzędzia developerskie odnajdując wstawiony fragment  ```html <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> ```  zobaczymy w value nasz token.
 
 ---
 
