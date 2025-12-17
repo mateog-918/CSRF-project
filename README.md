@@ -40,6 +40,14 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 pip install flask
 ```
 
+### 2.5 Sklonuj repozytorium
+```powershell
+git clone https://github.com/mateog-918/CSRF-project.git
+```
+
+### 2.75
+Wejdź do folderu repozytorium.
+
 ### 3. Uruchomienie aplikacji
 
 **Terminal 1 - Główna aplikacja:**
@@ -47,21 +55,21 @@ pip install flask
 cd feed-app
 python app.py
 ```
-Aplikacja będzie dostępna pod: http://localhost:5000
+Aplikacja będzie dostępna pod: http://127.0.0.1:5000
 
 **Terminal 2 - Złośliwa aplikacja:**
 ```powershell
 cd malicious-app
 python app.py
 ```
-Aplikacja będzie dostępna pod: http://localhost:5001
+Aplikacja będzie dostępna pod: http://127.0.0.1:5001
 
 ---
 
 ## Przetestuj atak CSRF (demo z prezentacji):
 
 ### Krok 1 - Zaloguj się
-- Otwórz przeglądarkę i wejdź na http://localhost:5000
+- Otwórz przeglądarkę i wejdź na http://127.0.0.1:5000
 - Zaloguj się używając:
   - Email: `batman@obawim.com`
   - Hasło: `password123`
@@ -144,9 +152,9 @@ csrf = CSRFProtect(app)
 ---
 
 ### Jak sprawdzić czy działa?
-1. Zaloguj się do aplikacji (http://localhost:5000)
+1. Zaloguj się do aplikacji (http://127.0.0.1:5000)
 2. Zmień numer telefonu w ustawieniach - ✅ powinno zadziałać
-3. Otwórz złośliwą stronę (http://localhost:5001/malicious) - ❌ powinna pojawić się strona błędu 400 Bad Request
+3. Otwórz złośliwą stronę (http://127.0.0.1:5001/malicious) - ❌ powinna pojawić się strona błędu 400 Bad Request
 4. Konto NIE powinno zostać usunięte!
 5. Otwierając narzędzia developerskie odnajdując wstawiony fragment  ```html <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> ```  zobaczymy w value nasz token.
 
@@ -205,8 +213,8 @@ app.config.update(
 
 **Test 3: Walidacja Origin/Referer**
 1. Dodaj sprawdzanie nagłówków przed wykonaniem akcji
-2. Request z localhost:5001 powinien być odrzucony
-3. Request z localhost:5000 powinien być akceptowany
+2. Request z 127.0.0.1:5001 powinien być odrzucony
+3. Request z 127.0.0.1:5000 powinien być akceptowany
 
 ---
 
@@ -286,9 +294,9 @@ if request.content_type != 'application/json':
 ### Jak sprawdzić czy działa?
 
 **Test 1: Atak (bez zabezpieczenia)**
-1. Zaloguj się do aplikacji (http://localhost:5000)
+1. Zaloguj się do aplikacji (http://127.0.0.1:5000)
 2. Sprawdź swój obecny email w ustawieniach
-3. Otwórz http://localhost:5001/json-attack w nowej karcie
+3. Otwórz http://127.0.0.1:5001/json-attack w nowej karcie
 4. Email powinien zostać zmieniony na `hacker@evil.com`
 5. To pokazuje że JSON API jest podatne na CSRF.
 
