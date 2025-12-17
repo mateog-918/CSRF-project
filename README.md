@@ -41,6 +41,7 @@ pip install flask
 ```
 
 ### 2.25
+Jak nie działa flask to wykonaj:
 ```power shell
 python -m pip install --upgrade pip
 ```
