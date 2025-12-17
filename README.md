@@ -40,6 +40,11 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 pip install flask
 ```
 
+### 2.25
+```power shell
+python -m pip install --upgrade pip
+```
+
 ### 2.5 Sklonuj repozytorium
 ```powershell
 git clone https://github.com/mateog-918/CSRF-project.git
